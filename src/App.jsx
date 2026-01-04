@@ -5,10 +5,9 @@ import {
   useTransform, 
   useSpring, 
   useMotionValue,
-  useMotionTemplate,
   AnimatePresence
 } from 'framer-motion';
-import { ArrowUpRight, Menu, ChevronDown, X } from 'lucide-react';
+import { ArrowUpRight, Menu, ChevronDown, X, Cpu } from 'lucide-react'; // Added Cpu here
 import './App.css';
 import logo from './assets/WhatsApp Image 2026-01-03 at 2.33.59 PM.jpeg';
 
@@ -50,35 +49,6 @@ const MagneticButton = ({ children, className, onClick }) => {
   );
 };
 
-const SchematicGlobe = () => (
-    <svg viewBox="0 0 100 100" className="w-full h-full stroke-current fill-none stroke-1">
-        <circle cx="50" cy="50" r="45" opacity="0.2"/>
-        <path d="M50 5 L50 95 M5 50 L95 50" opacity="0.2"/>
-        <motion.path 
-            d="M50 5 A 45 45 0 0 1 50 95 A 45 45 0 0 1 50 5" 
-            initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} transition={{ duration: 2 }}
-        />
-        <motion.circle cx="50" cy="50" r="20" initial={{ scale: 0 }} whileInView={{ scale: 1 }} transition={{ delay: 0.5 }} />
-    </svg>
-);
-
-const SchematicCpu = () => (
-    <svg viewBox="0 0 100 100" className="w-full h-full stroke-current fill-none stroke-1">
-        <rect x="20" y="20" width="60" height="60" opacity="0.2"/>
-        <motion.rect x="30" y="30" width="40" height="40" initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} transition={{ duration: 1.5 }}/>
-        <motion.path d="M50 30 L50 20 M50 70 L50 80 M30 50 L20 50 M70 50 L80 50" initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} transition={{ delay: 0.5, duration: 1 }} />
-    </svg>
-);
-
-const SchematicZap = () => (
-    <svg viewBox="0 0 100 100" className="w-full h-full stroke-current fill-none stroke-1">
-         <circle cx="50" cy="50" r="40" strokeDasharray="4 4" opacity="0.3">
-            <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="10s" repeatCount="indefinite"/>
-         </circle>
-         <motion.path d="M55 25 L35 55 L50 55 L45 80 L65 50 L50 50 L55 25 Z" initial={{ pathLength: 0, fill: "transparent" }} whileInView={{ pathLength: 1, fill: "rgba(255,255,255,0.1)" }} transition={{ duration: 1 }} />
-    </svg>
-);
-
 /* --- 2. LAYOUT & SECTIONS --- */
 
 const Navbar = () => {
@@ -94,7 +64,7 @@ const Navbar = () => {
     return (
         <>
             <motion.nav 
-                className={`fixed w-full top-0 z-50 px-6 py-4 flex justify-between items-center transition-all duration-300 ${scrolled ? 'bg-black/80 backdrop-blur-md border-b border-white/10' : 'mix-blend-difference'}`}
+                className={`fixed w-full top-0 z-50 px-6 py-4 flex justify-between items-center transition-all duration-500 ${scrolled ? 'bg-black/80 backdrop-blur-md border-b border-white/10' : 'mix-blend-difference'}`}
             >
                 <div className="flex items-center gap-3">
                     <motion.img 
@@ -111,7 +81,6 @@ const Navbar = () => {
                     Start Project
                 </MagneticButton>
                 
-                {/* Mobile Menu Button */}
                 <button 
                     className="md:hidden text-white z-50 relative"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -120,7 +89,6 @@ const Navbar = () => {
                 </button>
             </motion.nav>
 
-            {/* Mobile Menu Overlay */}
             <AnimatePresence>
                 {isMenuOpen && (
                     <motion.div 
@@ -130,7 +98,7 @@ const Navbar = () => {
                         transition={{ type: "spring", damping: 20 }}
                         className="fixed inset-0 bg-black z-40 flex flex-col justify-center items-center gap-8 md:hidden"
                     >
-                        {['Work', 'Services', 'Contact'].map((item) => (
+                        {['Work', 'Services', 'Team', 'Contact'].map((item) => (
                             <a 
                                 key={item}
                                 href={`#${item.toLowerCase()}`}
@@ -140,9 +108,6 @@ const Navbar = () => {
                                 {item}
                             </a>
                         ))}
-                        <button className="bg-white text-black px-8 py-3 rounded-full text-sm font-bold uppercase tracking-widest mt-8">
-                            Start Project
-                        </button>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -191,7 +156,6 @@ const Hero = () => {
                     <div className="h-[1px] w-8 md:w-12 bg-white/50"></div>
                 </motion.div>
                 
-                {/* Responsive Font Sizes */}
                 <h1 className="text-[14vw] md:text-[10vw] leading-[0.85] font-black uppercase tracking-tighter mix-blend-exclusion">
                     Constructing <br/>
                     <span className="text-stroke text-transparent">Digital</span> <br/>
@@ -210,12 +174,12 @@ const Hero = () => {
     );
 };
 
-/* --- FIXED VISIBILITY GALLERY --- */
+/* --- WORK GALLERY (Vertical Parallax) --- */
 
 const ProjectItem = ({ title, category, url, align }) => {
     const ref = useRef(null);
     const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-    const y = useTransform(scrollYProgress, [0, 1], ["-5%", "5%"]);
+    const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
 
     return (
         <div 
@@ -225,12 +189,9 @@ const ProjectItem = ({ title, category, url, align }) => {
             <div className={`relative w-full md:w-[65vw] h-[45vh] md:h-[70vh] group ${align === 'right' ? 'md:ml-auto' : 'md:mr-auto'}`}>
                 
                 <a href={url} target="_blank" rel="noopener noreferrer" className="block w-full h-full cursor-pointer">
-                    
-                    {/* Frame Container */}
                     <div className="overflow-hidden w-full h-full relative border border-white/20 bg-neutral-900 rounded-sm">
-                        
                         <motion.div 
-                            style={{ y }} // Subtle parallax on mobile/desktop
+                            style={{ y }}
                             className="absolute inset-0 w-full h-[120%] -top-[10%]"
                         >
                             <iframe 
@@ -241,26 +202,15 @@ const ProjectItem = ({ title, category, url, align }) => {
                                 className="w-full h-full border-0 pointer-events-none scale-100"
                             />
                         </motion.div>
-
-                        {/* HOVER REVEAL - Desktop Only */}
                         <div className="hidden md:block absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 pointer-events-none" />
-                        
-                        {/* THE FIX: CONTRAST GRADIENT (The "Scrim")
-                           This sits *behind* the text but *above* the iframe. 
-                           It ensures white text is readable even if the website is white.
-                        */}
                         <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none" />
-
                     </div>
 
-                    {/* Text Overlay - Positioned securely over the gradient */}
                     <div className={`absolute bottom-0 left-0 w-full p-6 md:p-12 z-20 pointer-events-none`}>
-                        {/* Title: Pure White, Drop Shadow for safety */}
                         <h3 className="text-4xl md:text-8xl font-black uppercase text-white leading-[0.8] drop-shadow-xl mb-4 md:mb-6">
                             {title}
                         </h3>
                         
-                        {/* Info Bar */}
                         <div className="flex items-center gap-3 md:gap-4 bg-white/10 backdrop-blur-md p-3 md:p-4 border border-white/20 w-fit pointer-events-auto rounded-sm">
                             <span className="font-mono text-[10px] md:text-sm text-gray-200 uppercase tracking-widest">{category}</span>
                             <div className="w-4 md:w-8 h-[1px] bg-white/50"></div>
@@ -269,7 +219,6 @@ const ProjectItem = ({ title, category, url, align }) => {
                             </span>
                         </div>
                     </div>
-
                 </a>
             </div>
         </div>
@@ -288,31 +237,18 @@ const WorkGallery = () => {
                 </div>
 
                 <div className="flex flex-col">
-                    <ProjectItem 
-                        title="Jepto" 
-                        category="Real Estate Platform" 
-                        url="https://jepto.vercel.app/" 
-                        align="left"
-                    />
-                    <ProjectItem 
-                        title="Lush Virtuals" 
-                        category="Digital Strategy" 
-                        url="https://lush-virtuals.vercel.app/" 
-                        align="right"
-                    />
-                    <ProjectItem 
-                        title="Tollis" 
-                        category="E-Commerce System" 
-                        url="https://tollis.vercel.app/" 
-                        align="left"
-                    />
+                    <ProjectItem title="Jepto" category="Real Estate Platform" url="https://jepto.vercel.app/" align="left" />
+                    <ProjectItem title="Lush Virtuals" category="Digital Strategy" url="https://lush-virtuals.vercel.app/" align="right" />
+                    <ProjectItem title="Tollis" category="E-Commerce System" url="https://tollis.vercel.app/" align="left" />
                 </div>
             </div>
         </section>
     )
 }
 
-const ServiceCard = ({ number, title, desc, icon }) => {
+/* --- SERVICES --- */
+
+const ServiceCard = ({ number, title, desc, svg: SvgIcon }) => {
     const [hovered, setHovered] = useState(false);
 
     return (
@@ -330,29 +266,45 @@ const ServiceCard = ({ number, title, desc, icon }) => {
                         {title}
                     </h3>
                 </div>
-                
                 <div className="mt-6 md:mt-0 max-w-sm relative">
                     <p className="text-sm leading-relaxed text-gray-400 transition-colors duration-300 group-hover:text-black/80">
                         {desc}
                     </p>
                 </div>
             </div>
-
             <motion.div 
                 initial={false}
-                animate={{ 
-                    height: hovered ? '100%' : '0%',
-                }}
+                animate={{ height: hovered ? '100%' : '0%' }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
                 className="absolute top-0 left-0 w-full bg-white z-0 flex items-center justify-center overflow-hidden pointer-events-none"
             >
                  <div className="absolute right-0 top-0 h-full w-1/2 opacity-10 text-black">
-                    {icon}
+                    <SvgIcon />
                  </div>
             </motion.div>
         </div>
     );
 };
+
+const SchematicGlobe = () => (
+    <svg viewBox="0 0 100 100" className="w-full h-full stroke-current fill-none stroke-1">
+        <circle cx="50" cy="50" r="45" opacity="0.2"/>
+        <path d="M50 5 L50 95 M5 50 L95 50" opacity="0.2"/>
+        <motion.path d="M50 5 A 45 45 0 0 1 50 95 A 45 45 0 0 1 50 5" initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} transition={{ duration: 2 }} />
+    </svg>
+);
+const SchematicCpu = () => (
+    <svg viewBox="0 0 100 100" className="w-full h-full stroke-current fill-none stroke-1">
+        <rect x="20" y="20" width="60" height="60" opacity="0.2"/>
+        <motion.rect x="30" y="30" width="40" height="40" initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} transition={{ duration: 1.5 }}/>
+    </svg>
+);
+const SchematicZap = () => (
+    <svg viewBox="0 0 100 100" className="w-full h-full stroke-current fill-none stroke-1">
+         <circle cx="50" cy="50" r="40" strokeDasharray="4 4" opacity="0.3" />
+         <motion.path d="M55 25 L35 55 L50 55 L45 80 L65 50 L50 50 L55 25 Z" initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} transition={{ duration: 1 }} />
+    </svg>
+);
 
 const Services = () => {
     return (
@@ -361,28 +313,60 @@ const Services = () => {
                 <h2 className="text-xs md:text-sm font-mono uppercase tracking-widest text-gray-500 mb-2">Our Architecture</h2>
             </div>
             <div className="flex flex-col">
-                <ServiceCard 
-                    number="1" 
-                    title="Websites" 
-                    desc="We build award-winning visuals. High-performance marketing sites that dominate search engines."
-                    icon={<SchematicGlobe />}
-                />
-                <ServiceCard 
-                    number="2" 
-                    title="Platforms" 
-                    desc="Scalable SaaS architectures. We handle the complexity of backend, security, and real-time data."
-                    icon={<SchematicCpu />}
-                />
-                <ServiceCard 
-                    number="3" 
-                    title="Systems" 
-                    desc="Internal tools and blockchain integrations. If it has an API, we can build a world around it."
-                    icon={<SchematicZap />}
-                />
+                <ServiceCard number="1" title="Websites" desc="Award-winning visuals. High-performance marketing sites." svg={SchematicGlobe} />
+                <ServiceCard number="2" title="Platforms" desc="Scalable SaaS architectures. Backend complexity handled." svg={SchematicCpu} />
+                <ServiceCard number="3" title="Systems" desc="Internal tools and blockchain integrations." svg={SchematicZap} />
             </div>
         </section>
     );
 };
+
+/* --- TEAM SECTION (Restored "Tactical Cards" with Colorful Images) --- */
+
+const TeamMember = ({ name, role, img, delay }) => (
+  <motion.div 
+    initial={{ opacity: 0, y: 50 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.6, delay }}
+    className="group relative w-full aspect-[3/4] bg-neutral-900 border border-white/10 overflow-hidden hover:border-white/60 transition-colors duration-500 cursor-none"
+  >
+    {/* Image Container - Grayscale to Color on hover */}
+    <div className="absolute inset-0 grayscale contrast-125 brightness-90 group-hover:grayscale-0 transition-all duration-700">
+      <img src={img} alt={name} className="w-full h-full object-cover" />
+    </div>
+    
+    {/* Overlay Data */}
+    <div className="absolute inset-0 p-6 flex flex-col justify-between bg-gradient-to-b from-transparent via-transparent to-black/90">
+      <div className="flex justify-between items-start opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <Cpu size={20} className="text-white animate-spin-slow" />
+        <span className="text-[10px] font-mono border border-white/30 px-2 py-1 rounded text-white bg-black/50 backdrop-blur-sm">AUTH: {name.split(' ')[0].toUpperCase()}</span>
+      </div>
+      
+      <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+        <h3 className="text-3xl font-black uppercase text-white leading-none mb-1">{name}</h3>
+        <p className="text-xs font-mono text-gray-400 uppercase tracking-widest">{role}</p>
+      </div>
+    </div>
+  </motion.div>
+);
+
+const Team = () => (
+  <section id="team" className="py-32 px-6">
+    <div className="container mx-auto">
+      <h2 className="text-sm font-mono uppercase tracking-widest text-gray-500 mb-12">/ Personnel</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Using specific colorful backgrounds as requested */}
+        <TeamMember name="Elvis" role="Founder" delay={0} img="https://api.dicebear.com/9.x/notionists/svg?seed=Felix&backgroundColor=b6e3f4" />
+        <TeamMember name="Godswill" role="Lead Dev" delay={0.1} img="https://api.dicebear.com/9.x/notionists/svg?seed=Aneka&backgroundColor=c0aede" />
+        <TeamMember name="Uche" role="Frontend" delay={0.2} img="https://api.dicebear.com/9.x/notionists/svg?seed=Gizmo&backgroundColor=ffdfbf" />
+        <TeamMember name="Desnan" role="Product Design" delay={0.3} img="https://api.dicebear.com/9.x/notionists/svg?seed=Milo&backgroundColor=d1d4f9" />
+      </div>
+    </div>
+  </section>
+);
+
+/* --- CONTACT --- */
 
 const Contact = () => {
     return (
@@ -443,7 +427,6 @@ const App = () => {
 
     return (
         <div className="bg-black min-h-screen cursor-none selection:bg-white selection:text-black font-sans overflow-x-hidden">
-            {/* Hide custom cursor on mobile to prevent touch interference */}
             <motion.div
                 className="hidden md:block fixed top-0 left-0 rounded-full pointer-events-none z-[9999]"
                 variants={variants}
@@ -457,6 +440,7 @@ const App = () => {
                 <Hero />
                 <WorkGallery />
                 <Services />
+                <Team />
                 <Contact />
             </main>
 
