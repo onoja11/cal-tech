@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+.text-stroke {
+  -webkit-text-stroke: 1px white;
+  color: transparent;
+}
+.text-stroke-black {
+    -webkit-text-stroke: 1px black;
+    color: transparent;
+}
+
+/* HIDE CURSOR GLOBALLY */
+body {
+    cursor: none;
+}
