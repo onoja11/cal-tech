@@ -7,7 +7,7 @@ import {
   useMotionValue,
   AnimatePresence
 } from 'framer-motion';
-import { ArrowUpRight, Menu, ChevronDown, X, Cpu } from 'lucide-react'; // Added Cpu here
+import { ArrowUpRight, Menu, ChevronDown, X, Cpu, CheckCircle2, AlertTriangle } from 'lucide-react';
 import './App.css';
 import emailjs from '@emailjs/browser'; // Import EmailJS
 import logo from './assets/WhatsApp Image 2026-01-03 at 2.33.59 PM.jpeg';
@@ -367,35 +367,98 @@ const Team = () => (
   </section>
 );
 
+/* --- NOTIFICATION COMPONENT --- */
+
+const StatusNotification = ({ status, message, onClose }) => {
+  // Auto-dismiss after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(onClose, 5000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <motion.div
+      initial={{ x: 100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: 100, opacity: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+      className="fixed bottom-8 right-4 md:right-8 z-[100] max-w-sm w-full"
+    >
+      <div className={`relative bg-neutral-900 border border-white/20 p-4 shadow-2xl overflow-hidden flex items-start gap-4 backdrop-blur-md`}>
+        
+        {/* Status Line (Left Border) */}
+        <div className={`absolute left-0 top-0 bottom-0 w-1 ${status === 'success' ? 'bg-green-500' : 'bg-red-500'}`} />
+        
+        {/* Icon */}
+        <div className={`mt-1 ${status === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+           {status === 'success' ? <CheckCircle2 size={24} /> : <AlertTriangle size={24} />}
+        </div>
+
+        {/* Text Content */}
+        <div className="flex-1">
+          <h4 className={`font-bold uppercase text-sm tracking-wider ${status === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+            {status === 'success' ? 'System Success' : 'System Error'}
+          </h4>
+          <p className="text-gray-400 text-xs md:text-sm mt-1 font-mono leading-relaxed">
+            {message}
+          </p>
+        </div>
+
+        {/* Close Button */}
+        <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+          <X size={16} />
+        </button>
+
+        {/* Progress Bar Animation */}
+        <motion.div 
+          initial={{ width: "100%" }}
+          animate={{ width: "0%" }}
+          transition={{ duration: 5, ease: "linear" }}
+          className={`absolute bottom-0 left-0 h-[2px] ${status === 'success' ? 'bg-green-500' : 'bg-red-500'}`}
+        />
+      </div>
+    </motion.div>
+  );
+};
 /* --- CONTACT --- */
 
 const Contact = () => {
     const formRef = useRef();
     const [loading, setLoading] = useState(false);
+    
+    // State to handle the notification
+    const [notification, setNotification] = useState(null); // { status: 'success' | 'error', message: '' }
 
     const sendEmail = (e) => {
         e.preventDefault();
         setLoading(true);
 
-        // Replace these with your actual IDs from Step 2
+        // Your IDs
         const SERVICE_ID = "service_vhnmjpo"; 
         const TEMPLATE_ID = "template_thcr0kl";
         const PUBLIC_KEY = "8KMDI_mf5yHPqTV1k";
 
         emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, formRef.current, PUBLIC_KEY)
             .then((result) => {
-                console.log(result.text);
                 setLoading(false);
-                alert("Transmission Received. We will be in touch."); // You can replace this with a toast notification
+                // Trigger Success Notification
+                setNotification({
+                    status: 'success',
+                    message: 'Transmission received. Connection established. We will respond shortly.'
+                });
                 e.target.reset();
             }, (error) => {
-                console.log(error.text);
                 setLoading(false);
-                alert("Transmission Failed. Please try again.");
+                // Trigger Error Notification
+                setNotification({
+                    status: 'error',
+                    message: 'Transmission failed. Signal lost. Please check your network and try again.'
+                });
+                console.error(error);
             });
     };
 
-    // Configuration for inputs to ensure EmailJS gets the right data
+    // Form Field Configuration
     const formFields = [
         { label: 'Name', name: 'user_name', type: 'text' },
         { label: 'Email', name: 'user_email', type: 'email' },
@@ -404,6 +467,18 @@ const Contact = () => {
 
     return (
         <section className="bg-neutral-900 text-white py-20 md:py-32 px-4 md:px-6 relative overflow-hidden" id="contact">
+            
+            {/* Render Notification if it exists */}
+            <AnimatePresence>
+                {notification && (
+                    <StatusNotification 
+                        status={notification.status} 
+                        message={notification.message} 
+                        onClose={() => setNotification(null)} 
+                    />
+                )}
+            </AnimatePresence>
+
             <div className="container mx-auto grid md:grid-cols-2 gap-12 md:gap-16 items-center">
                 <div>
                     <h2 className="text-4xl md:text-8xl font-black uppercase tracking-tighter mb-4 md:mb-8 leading-none">
@@ -414,13 +489,12 @@ const Contact = () => {
                     </p>
                 </div>
 
-                {/* Attached ref and onSubmit handler */}
                 <form ref={formRef} onSubmit={sendEmail} className="flex flex-col gap-6 md:gap-8 relative z-10">
                     {formFields.map((field, i) => (
                         <div key={i} className="group relative">
                             <input 
                                 type={field.type} 
-                                name={field.name} // Important: This connects to EmailJS template
+                                name={field.name} 
                                 required
                                 placeholder=" "
                                 className="peer w-full bg-transparent border-b border-white/20 py-3 md:py-4 text-lg md:text-xl outline-none focus:border-white transition-all text-white placeholder-transparent"
@@ -433,7 +507,6 @@ const Contact = () => {
                     ))}
                     
                     <div className="mt-4 md:mt-8 flex justify-start">
-                        {/* Changed Button to type="submit" */}
                         <MagneticButton className="bg-white text-black px-8 py-4 md:px-12 md:py-6 text-lg md:text-xl font-bold uppercase tracking-tight hover:bg-gray-200 transition-colors flex items-center gap-4 group">
                             <button type="submit" disabled={loading} className="flex items-center gap-4 w-full h-full">
                                 {loading ? 'Transmitting...' : 'Send Transmission'}
