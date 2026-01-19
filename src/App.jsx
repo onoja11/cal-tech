@@ -434,9 +434,9 @@ const Contact = () => {
         setLoading(true);
 
         // Your IDs
-        const SERVICE_ID = "service_vhnmjpo"; 
-        const TEMPLATE_ID = "template_thcr0kl";
-        const PUBLIC_KEY = "8KMDI_mf5yHPqTV1k";
+        const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+        const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+        const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
         emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, formRef.current, PUBLIC_KEY)
             .then((result) => {
