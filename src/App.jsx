@@ -9,6 +9,7 @@ import {
 } from 'framer-motion';
 import { ArrowUpRight, Menu, ChevronDown, X, Cpu } from 'lucide-react'; // Added Cpu here
 import './App.css';
+import emailjs from '@emailjs/browser'; // Import EmailJS
 import logo from './assets/WhatsApp Image 2026-01-03 at 2.33.59 PM.jpeg';
 
 /* --- 1. UTILITY COMPONENTS --- */
@@ -359,7 +360,7 @@ const Team = () => (
         {/* Using specific colorful backgrounds as requested */}
         <TeamMember name="Elvis" role="Founder" delay={0} img="https://api.dicebear.com/9.x/notionists/svg?seed=Felix&backgroundColor=b6e3f4" />
         <TeamMember name="Godswill" role="Lead Dev" delay={0.1} img="https://api.dicebear.com/9.x/notionists/svg?seed=Aneka&backgroundColor=c0aede" />
-        <TeamMember name="Uche" role="Frontend" delay={0.2} img="https://api.dicebear.com/9.x/notionists/svg?seed=Gizmo&backgroundColor=ffdfbf" />
+        <TeamMember name="Brendan" role="Frontend" delay={0.2} img="https://api.dicebear.com/9.x/notionists/svg?seed=Gizmo&backgroundColor=ffdfbf" />
         <TeamMember name="Desnan" role="Product Design" delay={0.3} img="https://api.dicebear.com/9.x/notionists/svg?seed=Milo&backgroundColor=d1d4f9" />
       </div>
     </div>
@@ -369,6 +370,38 @@ const Team = () => (
 /* --- CONTACT --- */
 
 const Contact = () => {
+    const formRef = useRef();
+    const [loading, setLoading] = useState(false);
+
+    const sendEmail = (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        // Replace these with your actual IDs from Step 2
+        const SERVICE_ID = "service_vhnmjpo"; 
+        const TEMPLATE_ID = "template_thcr0kl";
+        const PUBLIC_KEY = "8KMDI_mf5yHPqTV1k";
+
+        emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, formRef.current, PUBLIC_KEY)
+            .then((result) => {
+                console.log(result.text);
+                setLoading(false);
+                alert("Transmission Received. We will be in touch."); // You can replace this with a toast notification
+                e.target.reset();
+            }, (error) => {
+                console.log(error.text);
+                setLoading(false);
+                alert("Transmission Failed. Please try again.");
+            });
+    };
+
+    // Configuration for inputs to ensure EmailJS gets the right data
+    const formFields = [
+        { label: 'Name', name: 'user_name', type: 'text' },
+        { label: 'Email', name: 'user_email', type: 'email' },
+        { label: 'Project Details', name: 'message', type: 'text' }
+    ];
+
     return (
         <section className="bg-neutral-900 text-white py-20 md:py-32 px-4 md:px-6 relative overflow-hidden" id="contact">
             <div className="container mx-auto grid md:grid-cols-2 gap-12 md:gap-16 items-center">
@@ -381,26 +414,31 @@ const Contact = () => {
                     </p>
                 </div>
 
-                <form className="flex flex-col gap-6 md:gap-8 relative z-10" onSubmit={e => e.preventDefault()}>
-                    {['Name', 'Email', 'Project Details'].map((label, i) => (
+                {/* Attached ref and onSubmit handler */}
+                <form ref={formRef} onSubmit={sendEmail} className="flex flex-col gap-6 md:gap-8 relative z-10">
+                    {formFields.map((field, i) => (
                         <div key={i} className="group relative">
                             <input 
-                                type={label === 'Email' ? 'email' : 'text'} 
+                                type={field.type} 
+                                name={field.name} // Important: This connects to EmailJS template
                                 required
                                 placeholder=" "
                                 className="peer w-full bg-transparent border-b border-white/20 py-3 md:py-4 text-lg md:text-xl outline-none focus:border-white transition-all text-white placeholder-transparent"
                             />
                             <label className="absolute left-0 top-3 md:top-4 text-gray-500 text-xs md:text-sm font-mono uppercase transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-white peer-valid:-top-4 peer-valid:text-xs peer-valid:text-white pointer-events-none">
-                                {label}
+                                {field.label}
                             </label>
                             <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-white transition-all duration-500 peer-focus:w-full"></div>
                         </div>
                     ))}
                     
                     <div className="mt-4 md:mt-8 flex justify-start">
+                        {/* Changed Button to type="submit" */}
                         <MagneticButton className="bg-white text-black px-8 py-4 md:px-12 md:py-6 text-lg md:text-xl font-bold uppercase tracking-tight hover:bg-gray-200 transition-colors flex items-center gap-4 group">
-                            Send Transmission
-                            <ArrowUpRight className="group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
+                            <button type="submit" disabled={loading} className="flex items-center gap-4 w-full h-full">
+                                {loading ? 'Transmitting...' : 'Send Transmission'}
+                                {!loading && <ArrowUpRight className="group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />}
+                            </button>
                         </MagneticButton>
                     </div>
                 </form>
